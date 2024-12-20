@@ -1,0 +1,9 @@
+server:
+  port: 8083
+
+spring:
+  name: Temporaling
+  temporal:
+    connection:
+      target: 127.0.0.1:7233
+      namespace: default
