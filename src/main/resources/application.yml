@@ -1,9 +1,13 @@
 server:
-  port: 8083
+  port: 8081
 
 spring:
-  name: Temporaling
+  name: temporaling
+  data:
+    mongodb:
+      uri: mongodb://admin:admin!pass@192.168.1.3:27018/temporaling?replicaSet=rs0&retryWrites=true
   temporal:
     connection:
       target: 127.0.0.1:7233
+      #target: 192.168.1.3:7233
       namespace: default

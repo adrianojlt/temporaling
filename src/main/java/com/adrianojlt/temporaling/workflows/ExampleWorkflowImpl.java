@@ -7,7 +7,7 @@ import io.temporal.workflow.Workflow;
 
 import java.time.Duration;
 
-@WorkflowImpl(workers = "hello-worker")
+@WorkflowImpl
 public class ExampleWorkflowImpl implements ExampleWorkflow {
 
     private final ActivityOptions options =
@@ -18,7 +18,7 @@ public class ExampleWorkflowImpl implements ExampleWorkflow {
     private final ExampleActivity exampleActivity = Workflow.newActivityStub(ExampleActivity.class, options);
 
     @Override
-    public void execute() {
+    public void hello() {
         exampleActivity.hello();
     }
 }

@@ -9,5 +9,4 @@ class TemporalingApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }

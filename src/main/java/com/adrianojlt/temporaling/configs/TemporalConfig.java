@@ -1,6 +1,7 @@
 package com.adrianojlt.temporaling.configs;
 
 import com.adrianojlt.temporaling.activities.ExampleActivityImpl;
+import com.adrianojlt.temporaling.enums.TaskQueues;
 import com.adrianojlt.temporaling.workflows.ExampleWorkflowImpl;
 import io.temporal.client.WorkflowClient;
 import io.temporal.client.WorkflowClientOptions;
@@ -54,7 +55,7 @@ public class TemporalConfig {
             WorkerFactory workerFactory,
             ExampleActivityImpl exampleActivity) {
 
-        Worker worker = workerFactory.newWorker("example-worker");
+        Worker worker = workerFactory.newWorker(TaskQueues.EXAMPLE_WORKFLOW_TASK_QUEUE.name());
 
         worker.registerActivitiesImplementations(exampleActivity);
         worker.registerWorkflowImplementationTypes(ExampleWorkflowImpl.class);

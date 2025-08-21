@@ -53,7 +53,7 @@ public class ExampleTest {
             );
 
             // Start the workflow execution
-            WorkflowExecution execution = WorkflowClient.start(workflow::execute);
+            WorkflowExecution execution = WorkflowClient.start(workflow::hello);
 
             // Describe the workflow execution
             DescribeWorkflowExecutionResponse response = client.getWorkflowServiceStubs().blockingStub().describeWorkflowExecution(
@@ -97,6 +97,6 @@ public class ExampleTest {
         );
 
         // Start the workflow execution
-        workflow.execute();
+        workflow.hello();
     }
 }
