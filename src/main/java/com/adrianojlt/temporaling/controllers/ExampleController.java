@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Log4j2
 @RestController
-@RequestMapping("/example")
+@RequestMapping("/workflows/examples")
 public class ExampleController {
 
     private final ExampleService exampleService;
@@ -18,8 +18,8 @@ public class ExampleController {
         this.exampleService = exampleService;
     }
 
-    @PostMapping("/start")
-    public ResponseEntity<?> start() {
+    @PostMapping("/hello")
+    public ResponseEntity<?> hello() {
         exampleService.startExampleWorkflow();
         return ResponseEntity.ok().build();
     }

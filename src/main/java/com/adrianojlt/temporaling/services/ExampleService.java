@@ -28,6 +28,7 @@ public class ExampleService {
                     .setWorkflowId("example-workflow-id")
                     .build());
 
+
         io.temporal.client.WorkflowClient.start(workflow::hello);
     }
 }

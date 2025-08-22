@@ -1,12 +1,11 @@
 package com.adrianojlt.temporaling.configs;
 
 import com.adrianojlt.temporaling.activities.ExampleActivityImpl;
+import com.adrianojlt.temporaling.activities.SendEmailActivityImpl;
 import com.adrianojlt.temporaling.enums.TaskQueues;
 import com.adrianojlt.temporaling.workflows.ExampleWorkflowImpl;
+import com.adrianojlt.temporaling.workflows.SendEmailWorkflowImpl;
 import io.temporal.client.WorkflowClient;
-import io.temporal.client.WorkflowClientOptions;
-import io.temporal.serviceclient.WorkflowServiceStubs;
-import io.temporal.serviceclient.WorkflowServiceStubsOptions;
 import io.temporal.spring.boot.autoconfigure.properties.TemporalProperties;
 import io.temporal.worker.Worker;
 import io.temporal.worker.WorkerFactory;
@@ -21,26 +20,6 @@ import java.util.List;
 public class TemporalConfig {
 
     @Bean
-    public WorkflowServiceStubs workflowServiceStubs(TemporalProperties temporalProperties) {
-
-        var workflowServiceStubsOptions = WorkflowServiceStubsOptions.newBuilder()
-                .setTarget(temporalProperties.getConnection().getTarget())
-                .build();
-
-        return WorkflowServiceStubs.newServiceStubs(workflowServiceStubsOptions);
-    }
-
-    @Bean
-    public WorkflowClient workflowClient(TemporalProperties temporalProperties, WorkflowServiceStubs workflowServiceStubs) {
-
-        var workflowClientOptions = WorkflowClientOptions.newBuilder()
-                .setNamespace(temporalProperties.getNamespace())
-                .build();
-
-        return WorkflowClient.newInstance(workflowServiceStubs, workflowClientOptions);
-    }
-
-    @Bean
     public WorkerFactory workerFactory(WorkflowClient workflowClient) {
         return WorkerFactory.newInstance(workflowClient);
     }
@@ -51,17 +30,27 @@ public class TemporalConfig {
     }
 
     @Bean
+    public SendEmailActivityImpl sendEmailActivityImpl() {
+        return new SendEmailActivityImpl();
+    }
+
+    @Bean
     public List<Worker> registerWorkers(
             WorkerFactory workerFactory,
-            ExampleActivityImpl exampleActivity) {
+            ExampleActivityImpl exampleActivity,
+            SendEmailActivityImpl sendEmailActivity) {
 
-        Worker worker = workerFactory.newWorker(TaskQueues.EXAMPLE_WORKFLOW_TASK_QUEUE.name());
+        Worker exampleWorker = workerFactory.newWorker(TaskQueues.EXAMPLE_WORKFLOW_TASK_QUEUE.name());
+        Worker emailWorker = workerFactory.newWorker(TaskQueues.EMAIL_WORKFLOW_TASK_QUEUE.name());
 
-        worker.registerActivitiesImplementations(exampleActivity);
-        worker.registerWorkflowImplementationTypes(ExampleWorkflowImpl.class);
+        exampleWorker.registerActivitiesImplementations(exampleActivity);
+        exampleWorker.registerWorkflowImplementationTypes(ExampleWorkflowImpl.class);
+
+        emailWorker.registerActivitiesImplementations(sendEmailActivity);
+        emailWorker.registerWorkflowImplementationTypes(SendEmailWorkflowImpl.class);
 
         workerFactory.start();
 
-        return List.of(worker);
+        return List.of(exampleWorker, emailWorker);
     }
 }
