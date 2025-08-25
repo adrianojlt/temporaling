@@ -9,7 +9,7 @@ import io.temporal.workflow.WorkflowMethod;
 public interface SendEmailWorkflow {
 
     @WorkflowMethod
-    public void run(String email);
+    public void run(String email, Integer duration);
 
     @QueryMethod
     public EmailDetails details();

@@ -19,9 +19,9 @@ public class EmailController {
     }
 
     @PostMapping(value = "/subscribe", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> subscribe(@RequestParam String email) {
+    public ResponseEntity<?> subscribe(@RequestParam String email, @RequestParam Integer duration) {
 
-        this.emailService.startWorkflow(email);
+        this.emailService.startWorkflow(email, duration);
         return ResponseEntity.ok("subscribe created successfully");
     }
 

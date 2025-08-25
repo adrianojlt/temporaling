@@ -7,9 +7,11 @@ import io.temporal.failure.CanceledFailure;
 import io.temporal.spring.boot.WorkflowImpl;
 import io.temporal.workflow.CancellationScope;
 import io.temporal.workflow.Workflow;
+import lombok.extern.log4j.Log4j2;
 
 import java.time.Duration;
 
+@Log4j2
 @WorkflowImpl(workers = "send-email-worker")
 public class SendEmailWorkflowImpl implements SendEmailWorkflow {
 
@@ -22,16 +24,14 @@ public class SendEmailWorkflowImpl implements SendEmailWorkflow {
     private final SendEmailActivity activities = Workflow.newActivityStub(SendEmailActivity.class, options);
 
     @Override
-    public void run(String email) {
-
-        int duration = 4;
+    public void run(String email, Integer duration) {
 
         emailDetails.email = email;
         emailDetails.message = "Welcome to our Subscription Workflow!";
         emailDetails.subscribed = true;
         emailDetails.count = 0;
 
-        while (emailDetails.subscribed) {
+        while (emailDetails.subscribed && emailDetails.count < 10) {
 
             emailDetails.count += 1;
 
@@ -40,7 +40,8 @@ public class SendEmailWorkflowImpl implements SendEmailWorkflow {
             }
 
             try {
-                activities.sendEmail(emailDetails);
+                String response = activities.sendEmail(emailDetails);
+                log.info(response);
                 Workflow.sleep(Duration.ofSeconds(duration));
             }
             catch (CanceledFailure e) {
@@ -48,10 +49,12 @@ public class SendEmailWorkflowImpl implements SendEmailWorkflow {
                 emailDetails.subscribed = false;
                 emailDetails.message = "Sorry to see you go";
 
-                CancellationScope sendGoodbye = Workflow.newDetachedCancellationScope(() -> activities.sendEmail(emailDetails));
-                sendGoodbye.run();
+                CancellationScope sendGoodbye = Workflow.newDetachedCancellationScope(() -> {
+                    String result = activities.sendEmail(emailDetails);
+                    log.info(result);
+                });
 
-                return;
+                sendGoodbye.run();
             }
         }
     }

@@ -17,7 +17,7 @@ public class EmailService {
         this.client = client;
     }
 
-    public void startWorkflow(String email) {
+    public void startWorkflow(String email, Integer duration) {
 
         WorkflowOptions options = WorkflowOptions.newBuilder()
                 .setTaskQueue(TaskQueues.EMAIL_WORKFLOW_TASK_QUEUE.name())
@@ -25,7 +25,7 @@ public class EmailService {
                 .build();
 
         SendEmailWorkflow workflow = client.newWorkflowStub(SendEmailWorkflow.class, options);
-        WorkflowClient.start(workflow::run, email);
+        WorkflowClient.start(workflow::run, email, duration);
     }
 
     public EmailDetails getWorkflowDetails(String email) {
