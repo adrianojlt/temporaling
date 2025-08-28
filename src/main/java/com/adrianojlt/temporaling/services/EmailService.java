@@ -3,11 +3,12 @@ package com.adrianojlt.temporaling.services;
 import com.adrianojlt.temporaling.enums.TaskQueues;
 import com.adrianojlt.temporaling.models.EmailDetails;
 import com.adrianojlt.temporaling.workflows.SendEmailWorkflow;
-import io.temporal.client.WorkflowClient;
-import io.temporal.client.WorkflowOptions;
-import io.temporal.client.WorkflowStub;
+import io.grpc.StatusRuntimeException;
+import io.temporal.client.*;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
+@Log4j2
 @Service
 public class EmailService {
 
@@ -29,8 +30,13 @@ public class EmailService {
     }
 
     public EmailDetails getWorkflowDetails(String email) {
-        SendEmailWorkflow workflow = client.newWorkflowStub(SendEmailWorkflow.class, email);
-        return workflow.details();
+        try {
+            SendEmailWorkflow workflow = client.newWorkflowStub(SendEmailWorkflow.class, email);
+            return workflow.details();
+        } catch (WorkflowNotFoundException | StatusRuntimeException | WorkflowQueryException e) {
+            log.error(e.getCause().getMessage());
+            return null;
+        }
     }
 
     public void cancelWorkflow(String email) {
